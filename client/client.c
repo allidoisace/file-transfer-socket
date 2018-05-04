@@ -27,7 +27,8 @@ int main(int argc, char *argv[]) {
         fprintf(stderr,"ERROR, no such host\n");
         exit(0);
     }
-    bzero((char *) &serv_addr, sizeof(serv_addr));
+    memset((char *) &serv_addr, 0, sizeof(serv_addr));
+    // bzero((char *) &serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     // bcopy copys string 1 to string 2 based on the length.
     bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
@@ -37,43 +38,30 @@ int main(int argc, char *argv[]) {
         error("ERROR connecting");
     }
 
-    // printf("Please enter the message: ");
-
-    // bzero(buffer,1024);
-    // fgets(buffer,1023,stdin);
-    // n = write(sockfd,buffer,strlen(buffer));
-    // if (n < 0) {
-    //     error("ERROR writing to socket");
-    // }
-
-    // bzero(buffer,1024);
-    // n = read(sockfd,buffer,1023);
-    // if (n < 0) {
-    //     error("ERROR reading from socket");
-    // }
-    // printf("%s\n",buffer);
-
-
     printf("Please enter the file name: ");
-    bzero(file_name,256);
-    fgets(file_name,255,stdin);
+    memset(file_name, 0, sizeof(file_name));
+    fgets(file_name, sizeof(file_name), stdin);
+    if (file_name[strlen(file_name) - 1] == '\n') {
+        file_name[strlen(file_name) - 1] = '\0';
+    }
+    fflush(stdin);
+
     n = write(sockfd,file_name,strlen(file_name));
     if (n < 0) {
         error("ERROR writing to socket");
     }
 
-    bzero(buffer, 1024);
+    memset(buffer, 0, sizeof(buffer));
     FILE *f;
     int words = 0;
     char c;
-    f = fopen("new.txt", "r");
+    f = fopen(file_name, "rb");
 
     if(f == NULL) {
         perror ("Error opening file");
     } else {
         while(1) {
-            int nread = fread(buffer,1,1024,f);
-            printf("Bytes read %d \n", nread);
+            int nread = fread(buffer, 1, 1024, f);
 
             if(nread > 0) {
                 write(sockfd, buffer, nread);

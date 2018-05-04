@@ -13,7 +13,10 @@
 #include <sys/socket.h>
 // internet domain addresses
 #include <netinet/in.h>
+// threading
+#include<pthread.h>
 
+void *transferFile(void *socket);
 void error(char *msg);
 
 #endif
